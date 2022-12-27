@@ -2,6 +2,13 @@
 
 CoordSystems is a Python package to help working with different coordinate reference systems at the same time. The intention is to support annotated types for Cartesian, Polar and Spherical coordinates.
 
+## Installation
+
+Just install it with `pip`:
+```shell
+pip install coordsystems
+```
+
 ## Usage
 
 The Coordinate types carries out the conversion when needed. For example, when summing a `Cartesian` and a `Spherical`, the `Spherical` will be first converted to `Cartesian`, and then summed up.
