@@ -42,7 +42,11 @@ class Cartesian(Coordinate):
 
     @dispatch
     def __eq__(self, other: 'Cartesian'):
-        return np.all(self.point == other.point)
+        return np.allclose(self.point, other.point)
+
+    @dispatch
+    def __eq__(self, other: 'Spherical'):
+        return self == Cartesian(other)
 
     @dispatch
     def __sub__(self, other: 'Cartesian'):
@@ -90,6 +94,9 @@ class Cartesian(Coordinate):
 
     def __bool__(self):
         return bool(np.any(self.point))
+
+    def __abs__(self):
+        return np.linalg.norm(self.point)
 
     @property
     def x(self):
@@ -156,6 +163,18 @@ class Spherical(Coordinate):
     @dispatch
     def __mul__(self, other: Number) -> 'Spherical':
         return Spherical([self.r * other, self.theta, self.phi])
+
+    @dispatch
+    def __eq__(self, other: Cartesian):
+        return Cartesian(self) == other
+
+    @dispatch
+    def __eq__(self, other: 'Spherical'):
+        # TODO: write a decent implementation. there's no need to convert them.
+        return Cartesian(self) == Cartesian(other)
+
+    def __abs__(self):
+        return abs(self.r)
 
     def __str__(self):
         return f"Spherical({self.r}, {self.theta}, {self.phi})"
