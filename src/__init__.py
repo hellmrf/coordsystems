@@ -19,7 +19,7 @@ class Cartesian(Coordinate):
 
     @dispatch
     def __init__(self, point: 'Cartesian'):
-        self = point
+        self.point = point.point
 
     @dispatch
     def __init__(self, p: 'Spherical'):
@@ -27,6 +27,9 @@ class Cartesian(Coordinate):
         y = p.r * np.sin(p.theta) * np.sin(p.phi)
         z = p.r * np.cos(p.theta)
         self.point = np.array([x, y, z])
+
+    def __copy__(self):
+        return Cartesian(self.point)
 
     @dispatch
     def __add__(self, other: 'Cartesian') -> 'Cartesian':
@@ -124,9 +127,9 @@ class Cartesian(Coordinate):
 
 
 class Spherical(Coordinate):
-    r: Number
-    theta: Number
-    phi: Number
+    r: float
+    theta: float
+    phi: float
 
     @dispatch
     def __init__(self, point: Union[list, np.ndarray]):
@@ -142,7 +145,12 @@ class Spherical(Coordinate):
 
     @dispatch
     def __init__(self, point: 'Spherical'):
-        self = point
+        self.r = point.r
+        self.theta = point.theta
+        self.phi = point.phi
+
+    def __copy__(self):
+        return Spherical([self.r, self.theta, self.phi])
 
     @dispatch
     def __add__(self, other: 'Spherical') -> 'Spherical':
