@@ -1,6 +1,6 @@
 from abc import ABC
 from numbers import Number
-from typing import Union
+from typing import Optional, Union
 
 import numpy as np
 from plum import dispatch
@@ -127,29 +127,63 @@ class Cartesian(Coordinate):
 
 
 class Spherical(Coordinate):
-    r: float
-    theta: float
-    phi: float
+    _r: float
+    _theta: float
+    _phi: float
+    unique: bool = False
 
     @dispatch
-    def __init__(self, point: Union[list, np.ndarray], unique_coords=True):
-        self.r = point[0]
-        self.theta = point[1]
-        self.phi = point[2]
-        if unique_coords:
+    def __init__(self, point: Union[list, np.ndarray], unique=False):
+        self._r = point[0]
+        self._theta = point[1]
+        self._phi = point[2]
+        self.unique = unique
+        if self.unique:
             self.simplify()
 
     @dispatch
-    def __init__(self, point: Cartesian):
-        self.r = np.linalg.norm([point.x, point.y, point.z])
-        self.theta = np.arccos(point.z / self.r)
-        self.phi = np.arctan2(point.y, point.x)
+    def __init__(self, point: Cartesian, unique=False):
+        self._r = np.linalg.norm([point.x, point.y, point.z])
+        self._theta = np.arccos(point.z / self.r)
+        self._phi = np.arctan2(point.y, point.x)
+        self.unique = unique
 
     @dispatch
-    def __init__(self, point: 'Spherical'):
-        self.r = point.r
-        self.theta = point.theta
-        self.phi = point.phi
+    def __init__(self, point: 'Spherical', unique: Optional[bool]=None):
+        self._r = point.r
+        self._theta = point.theta
+        self._phi = point.phi
+        self.unique = point.unique if unique is None else unique
+        if self.unique:
+            self.simplify()
+
+    @property
+    def r(self):
+        return self._r
+
+    @property
+    def theta(self):
+        return self._theta
+
+    @property
+    def phi(self):
+        return self._phi
+
+    @r.setter
+    def r(self, new):
+        self._r = new
+        if new < 0 and self.unique:
+            self.simplify()
+
+    @theta.setter
+    def theta(self, new):
+        self._theta = new
+        if not 0 <= new <= np.pi and self.unique:
+            self.simplify()
+  
+    @phi.setter
+    def phi(self, new):
+        self._phi = new % (2*np.pi) if self.unique else new
 
     def __copy__(self):
         return Spherical([self.r, self.theta, self.phi])
@@ -181,7 +215,15 @@ class Spherical(Coordinate):
     @dispatch
     def __eq__(self, other: 'Spherical'):
         # TODO: write a decent implementation. there's no need to convert them.
-        return Cartesian(self) == Cartesian(other)
+        if not other.unique:
+            other = Spherical(other, unique=True)
+
+        if self.unique:
+            return np.allclose([self.r, self.theta, self.phi], [other.r, other.theta, other.phi])
+        else:
+            s = Spherical(self, unique=True)
+            return np.allclose([s.r, s.theta, s.phi], [other.r, other.theta, other.phi])
+
 
     def __abs__(self):
         return abs(self.r)
@@ -197,18 +239,20 @@ class Spherical(Coordinate):
 
     def simplify(self):
         """Simplifies the Spherical Coordinate ensuring r ∈ [0, ∞), θ ∈ [0, π] and φ ∈ [0, 2π)."""
+        r, theta, phi = self._r, self._theta, self._phi
         # Constraint 1: r ≥ 0
-        if self.r < 0:
-            self.r *= -1
-            self.theta = np.pi - self.theta
-            self.phi += np.pi
+        if r < 0:
+            r *= -1
+            theta = np.pi - theta
+            phi += np.pi
 
         # Constraint 2: 0 ≤ θ ≤ π
-        self.theta = self.theta % (2 * np.pi)  # take off full revolutions
-        if self.theta > np.pi:
-            self.theta = 2 * np.pi - self.theta
-            self.phi += np.pi  # θ → θ - π ⇒ r → -r, so we correct this.
+        theta = theta % (2 * np.pi)  # take off full revolutions
+        if theta > np.pi:
+            theta = 2 * np.pi - theta
+            phi += np.pi  # θ → θ - π ⇒ r → -r, so we correct this.
 
         # Constraint 3: 0 ≤ φ < 2π
-        self.phi = self.phi % (2 * np.pi)
+        phi = phi % (2 * np.pi)
+        self._r, self._theta, self._phi = r, theta, phi
         return self
