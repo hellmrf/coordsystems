@@ -132,10 +132,12 @@ class Spherical(Coordinate):
     phi: float
 
     @dispatch
-    def __init__(self, point: Union[list, np.ndarray]):
+    def __init__(self, point: Union[list, np.ndarray], unique_coords=True):
         self.r = point[0]
         self.theta = point[1]
         self.phi = point[2]
+        if unique_coords:
+            self.simplify()
 
     @dispatch
     def __init__(self, point: Cartesian):
@@ -192,3 +194,21 @@ class Spherical(Coordinate):
 
     def __bool__(self):
         return np.isclose(self.r, 0)
+
+    def simplify(self):
+        """Simplifies the Spherical Coordinate ensuring r ∈ [0, ∞), θ ∈ [0, π] and φ ∈ [0, 2π)."""
+        # Constraint 1: r ≥ 0
+        if self.r < 0:
+            self.r *= -1
+            self.theta = np.pi - self.theta
+            self.phi += np.pi
+
+        # Constraint 2: 0 ≤ θ ≤ π
+        self.theta = self.theta % (2 * np.pi)  # take off full revolutions
+        if self.theta > np.pi:
+            self.theta = 2 * np.pi - self.theta
+            self.phi += np.pi  # θ → θ - π ⇒ r → -r, so we correct this.
+
+        # Constraint 3: 0 ≤ φ < 2π
+        self.phi = self.phi % (2 * np.pi)
+        return self
