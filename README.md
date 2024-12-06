@@ -53,6 +53,18 @@ In a `q = Spherical(...)`, you can also access each coordinate independently (`q
 
 In any case, the implemented operations takes care of the system and try to do any operation in a Cartesian base, converting stuff when appropriate.
 
+## Development
+
+To help in the development of this project, just clone the repository and install the [`uv`](https://docs.astral.sh/uv/) tool as a global dependency (you don't need a global Python executable or a environment manager like `conda` or `pipenv`).
+
+After cloning, you can run the GUI with:
+
+```shell
+$ uv run gui
+```
+
+It'll create an environment in `.venv/`, install dependencies and run the project inside the correct environment.
+
 ## TODO
 
 We still need to implement many things in this package before it gets ready for production.
