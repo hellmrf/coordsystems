@@ -26,3 +26,8 @@ include = [
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
 sources = ["src"]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.13.0",
+]
