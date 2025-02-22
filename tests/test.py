@@ -11,7 +11,7 @@ sys.path.append(os.path.join(
 
 import unittest
 
-from coordsystems import *
+from coordsystems import Cartesian, Spherical
 
 
 class TestBasics(unittest.TestCase):
