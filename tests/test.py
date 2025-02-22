@@ -5,13 +5,13 @@ import numpy as np
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__))))
 sys.path.append(os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), "src"))
+    os.path.dirname(os.path.dirname(__file__)), "coordsystems"))
 
 π = np.pi
 
 import unittest
 
-from src import *
+from coordsystems import *
 
 
 class TestBasics(unittest.TestCase):
