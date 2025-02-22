@@ -12,7 +12,7 @@ wheels = [
 
 [[package]]
 name = "coordsystems"
-version = "0.0.1"
+version = "0.0.3"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },
