@@ -10,8 +10,14 @@ classifiers = [
 ]
 
 requires-python = ">=3.9"
-dependencies = ["numpy>1.24.4", "plum-dispatch"]
-scripts = { "coordsystems" = "coordsystems.main:main" }
+dependencies = [
+    "numpy>1.24.4",
+    "plum-dispatch",
+]
+#scripts = { "coordsystems" = "coordsystems.main:main" }
+
+[project.scripts]
+coordsystems = "coordsystems.main:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -19,15 +25,15 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "src",
+    "coordsystems",
     "tests"
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
-sources = ["src"]
+packages = ["coordsystems"]
 
 [dependency-groups]
 dev = [
     "mypy>=1.13.0",
+    "ruff>=0.9.7",
 ]

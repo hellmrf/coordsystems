@@ -18,11 +18,11 @@ class Cartesian(Coordinate):
         self.point = np.array(point)
 
     @dispatch
-    def __init__(self, point: 'Cartesian'):
+    def __init__(self, point: "Cartesian"):
         self.point = point.point
 
     @dispatch
-    def __init__(self, p: 'Spherical'):
+    def __init__(self, p: "Spherical"):
         x = p.r * np.sin(p.theta) * np.cos(p.phi)
         y = p.r * np.sin(p.theta) * np.sin(p.phi)
         z = p.r * np.cos(p.theta)
@@ -32,27 +32,27 @@ class Cartesian(Coordinate):
         return Cartesian(self.point)
 
     @dispatch
-    def __add__(self, other: 'Cartesian') -> 'Cartesian':
+    def __add__(self, other: "Cartesian") -> "Cartesian":
         return Cartesian(self.point + other.point)
 
     @dispatch
-    def __add__(self, other: 'Spherical') -> 'Cartesian':
+    def __add__(self, other: "Spherical") -> "Cartesian":
         return self + Cartesian(other)
 
     @dispatch
-    def __sub__(self, other: 'Spherical') -> 'Cartesian':
+    def __sub__(self, other: "Spherical") -> "Cartesian":
         return self - Cartesian(other)
 
     @dispatch
-    def __eq__(self, other: 'Cartesian'):
+    def __eq__(self, other: "Cartesian"):
         return np.allclose(self.point, other.point)
 
     @dispatch
-    def __eq__(self, other: 'Spherical'):
+    def __eq__(self, other: "Spherical"):
         return self == Cartesian(other)
 
     @dispatch
-    def __sub__(self, other: 'Cartesian'):
+    def __sub__(self, other: "Cartesian"):
         return Cartesian(self.point - other.point)
 
     @dispatch
@@ -65,11 +65,11 @@ class Cartesian(Coordinate):
 
     @dispatch
     def __getitem__(self, key: str):
-        if key == 'x':
+        if key == "x":
             return self.x
-        elif key == 'y':
+        elif key == "y":
             return self.y
-        elif key == 'z':
+        elif key == "z":
             return self.z
         else:
             raise KeyError("Cartesians have keys x, y and z.")
@@ -80,11 +80,11 @@ class Cartesian(Coordinate):
 
     @dispatch
     def __setitem__(self, key: str, value: Number):
-        if key == 'x':
+        if key == "x":
             self.point[0] = value
-        elif key == 'y':
+        elif key == "y":
             self.point[1] = value
-        elif key == 'z':
+        elif key == "z":
             self.point[2] = value
         else:
             raise KeyError("Cartesians have keys x, y and z.")
@@ -149,7 +149,7 @@ class Spherical(Coordinate):
         self.unique = unique
 
     @dispatch
-    def __init__(self, point: 'Spherical', unique: Optional[bool]=None):
+    def __init__(self, point: "Spherical", unique: Optional[bool] = None):
         self._r = point.r
         self._theta = point.theta
         self._phi = point.phi
@@ -180,16 +180,16 @@ class Spherical(Coordinate):
         self._theta = new
         if not 0 <= new <= np.pi and self.unique:
             self.simplify()
-  
+
     @phi.setter
     def phi(self, new):
-        self._phi = new % (2*np.pi) if self.unique else new
+        self._phi = new % (2 * np.pi) if self.unique else new
 
     def __copy__(self):
         return Spherical([self.r, self.theta, self.phi])
 
     @dispatch
-    def __add__(self, other: 'Spherical') -> 'Spherical':
+    def __add__(self, other: "Spherical") -> "Spherical":
         return Spherical(Cartesian(self) + Cartesian(other))
 
     @dispatch
@@ -197,15 +197,15 @@ class Spherical(Coordinate):
         return Cartesian(self) + other
 
     @dispatch
-    def __sub__(self, other: 'Spherical') -> 'Spherical':
+    def __sub__(self, other: "Spherical") -> "Spherical":
         return Spherical(Cartesian(self) - Cartesian(other))
 
     @dispatch
-    def __sub__(self, other: Cartesian) -> 'Spherical':
+    def __sub__(self, other: Cartesian) -> "Spherical":
         return Spherical(Cartesian(self) - other)
 
     @dispatch
-    def __mul__(self, other: Number) -> 'Spherical':
+    def __mul__(self, other: Number) -> "Spherical":
         return Spherical([self.r * other, self.theta, self.phi])
 
     @dispatch
@@ -213,17 +213,18 @@ class Spherical(Coordinate):
         return Cartesian(self) == other
 
     @dispatch
-    def __eq__(self, other: 'Spherical'):
+    def __eq__(self, other: "Spherical"):
         # TODO: write a decent implementation. there's no need to convert them.
         if not other.unique:
             other = Spherical(other, unique=True)
 
         if self.unique:
-            return np.allclose([self.r, self.theta, self.phi], [other.r, other.theta, other.phi])
+            return np.allclose(
+                [self.r, self.theta, self.phi], [other.r, other.theta, other.phi]
+            )
         else:
             s = Spherical(self, unique=True)
             return np.allclose([s.r, s.theta, s.phi], [other.r, other.theta, other.phi])
-
 
     def __abs__(self):
         return abs(self.r)

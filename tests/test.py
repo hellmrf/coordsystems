@@ -4,14 +4,15 @@ import sys
 import numpy as np
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__))))
-sys.path.append(os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), "src"))
+sys.path.append(
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "coordsystems")
+)
 
 π = np.pi
 
 import unittest
 
-from src import *
+from coordsystems import Cartesian, Spherical
 
 
 class TestBasics(unittest.TestCase):
@@ -21,12 +22,13 @@ class TestBasics(unittest.TestCase):
         self.assertEqual(c, c)
         self.assertEqual(s, s)
         self.assertEqual(Cartesian([0, 0, 1]), Spherical([1, 0, 0]))
-        self.assertEqual(Cartesian(
-            [-2.4492935982947064e-16, 5.99903913064743e-32, 1.0]), Spherical([1, 0, 0]))
+        self.assertEqual(
+            Cartesian([-2.4492935982947064e-16, 5.99903913064743e-32, 1.0]),
+            Spherical([1, 0, 0]),
+        )
 
 
 class TestCartesianArithmetic(unittest.TestCase):
-
     def test_sum(self):
         c = Cartesian([1, 2, 3])
         c2 = Cartesian([4, 2, 3])
@@ -99,5 +101,5 @@ class TestSphericalSimplify(unittest.TestCase):
         self.assertUniqueSpheric(s2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
